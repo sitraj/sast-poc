@@ -91,8 +91,9 @@ class UserController(private val userService: UserService, private val vulnobjec
     @GetMapping("/test1")
     fun foobar1(@RequestParam(name = "q", required = false, defaultValue = "hi") search: String): List<Message> {
         return database.useConnection { conn ->
-            val sql = "SELECT * FROM messages WHERE text = '${search}'"
+            val sql = "SELECT * FROM messages WHERE text = ?"
             conn.prepareStatement(sql).use { statement ->
+                statement.setString(1, search)
                 statement.executeQuery().asIterable().toList()
             }
         }
