@@ -3,13 +3,31 @@ package com.sast.demo.service
 import com.sast.demo.model.User
 import org.springframework.stereotype.Service
 
+
+import org.owasp.html.PolicyFactory
+import org.owasp.html.Sanitizers
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+
 @Service
 class UserService {
+    companion object {
+        private const val ALLOWED_HTML_TAGS = "p, noscript, style"
+    }
+
     // Hardcoded secret for SAST testing
     private val apiKey = "sk_test_1234567890abcdef" // SAST should flag this
     private val github_secret = "ghp_A1bC2dE3fH4iJ5kL6mN7oP8qR9sT0u" // This is random PAT and not real PAT to test secret detection capabilities of SAST
     private val github_secret1 = "github_pat_01A2b3C4d5E6f7G8h9I0jK1lM2nO3pQ4rS5t" // This is random PAT and not real PAT to test secret detection capabilities of SAST
 
+    fun sanitizeHTML(input: String): String {
+        val htmlPolicyBuilder = org.owasp.html.HtmlPolicyBuilder()
+        val policy: PolicyFactory = htmlPolicyBuilder
+            .allowElements(*ALLOWED_HTML_TAGS.split("\\s*,\\s*".toRegex()).toTypedArray())
+            .allowTextIn("style")
+            .toFactory()
+        return policy.sanitize(input)
+    }
 
     fun getUserById(id: String): User {
         // Insecure SQL query for SAST testing
@@ -43,4 +61,6 @@ class UserService {
     }
 
     fun getApiKey(): String = apiKey
+
+    
 }
