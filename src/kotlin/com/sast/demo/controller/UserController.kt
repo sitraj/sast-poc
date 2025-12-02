@@ -148,43 +148,6 @@ class UserController(private val userService: UserService, private val vulnobjec
         return "Create Logged"
     }
 
-    @GetMapping("/readfile")
-    fun readFile(@RequestParam(name = "path", required = true) path: String, request: HttpServletRequest): String {
-        // Intentionally vulnerable code: directly uses user-supplied path
-        val file = File(path).inputStream().readBytes().toString(Charsets.UTF_8)
-      /*  if (!file.exists() || !file.isFile) {
-            return "File not found: $path"
-        }*/ 
-       // val result = file.readText();     
-        // ^ I think I understood why- since readText is a Kotlin add-on and not io.File method  
-        return file //this is NOT xss...
-    }
-        @GetMapping("/rmkfile")
-    fun makefile(@RequestParam(name = "path", required = true) path: String, request: HttpServletRequest): String {
-        // Intentionally vulnerable code: directly uses user-supplied path
-        val file = File(path)
-        file.mkdir()
-        return "done"
-    }
-        @GetMapping("/rdelfile")
-    fun deleteFile(@RequestParam(name = "path", required = true) path: String, request: HttpServletRequest): String {
-        val file = File(path)
-        file.delete()
-        return "done"
-    }
-
-    @GetMapping("/redirect2")
-    fun redirect(@RequestParam(name = "next", required = false, defaultValue = "/") next: String, request: HttpServletRequest): org.springframework.http.ResponseEntity<Void> {
-        // open redirect?
-       // val target = if (next.isBlank()) "/" else next
-        return org.springframework.http.ResponseEntity.status(302).header("Location", next).build()
-    }
-
-
-     @GetMapping("/redirect")
-  fun redirect2(@RequestParam(name = "url", required = false, defaultValue = "/") url: String): String {
-      return "redirect:$url"
-  }
 
     @GetMapping("/enter")
     fun enterValue(@RequestParam(name = "value", required = true) value: String): String {
